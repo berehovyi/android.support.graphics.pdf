@@ -1,16 +1,28 @@
 LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
-
-FRAMEWORK_GRAPHICS_PATH		:= frameworks/base/core/jni/android/graphics
+FRAMEWORK_BASE_PATH			:= frameworks/base
+FRAMEWORK_BASE_INCLUDE_PATH	:= $(FRAMEWORK_BASE_PATH)/include
+FRAMEWORK_JNI_PATH			:= $(FRAMEWORK_BASE_PATH)/core/jni
+FRAMEWORK_GRAPHICS_PATH		:= $(FRAMEWORK_JNI_PATH)/android/graphics
 EXTERNAL_SKIA_PATH			:= external/skia
 SYSTEM_CORE_PATH			:= system/core
+LIBNATIVEHELPER_PATH		:= libnativehelper
+PREBUILD_PATH				:= prebuild
+EXTERNAL_PDFIUM_PATH		:= external/pdfium
 
 LOCAL_MODULE		:= SupportPdf
 LOCAL_C_INCLUDES	:= \
+				jni/$(FRAMEWORK_JNI_PATH) \
 				jni/$(FRAMEWORK_GRAPHICS_PATH) \
 				jni/$(EXTERNAL_SKIA_PATH)/core \
-				jni/$(SYSTEM_CORE_PATH)
+				jni/$(EXTERNAL_SKIA_PATH)/image \
+				jni/$(EXTERNAL_SKIA_PATH)/utils \
+				jni/$(SYSTEM_CORE_PATH)/include \
+				jni/$(LIBNATIVEHELPER_PATH) \
+				jni/$(FRAMEWORK_BASE_INCLUDE_PATH) \
+				jni/$(PREBUILD_PATH) \
+				jni/$(EXTERNAL_PDFIUM_PATH)/fpdfsdk/include
 						
 LOCAL_SRC_FILES		:= \
 				SupportPdf.cpp \
@@ -462,7 +474,11 @@ LOCAL_SRC_FILES		:= \
 				$(EXTERNAL_SKIA_PATH)/gpu/gl/SkNullGLContext.cpp \
 	third_party/etc1/etc1.cpp \
 	third_party/ktx/ktx.cpp \
-				$(EXTERNAL_SKIA_PATH)/core/SkFlate.cpp
+				$(EXTERNAL_SKIA_PATH)/core/SkFlate.cpp \
+				$(LIBNATIVEHELPER_PATH)/JNIHelp.cpp \
+    			$(LIBNATIVEHELPER_PATH)/JniConstants.cpp \
+    			$(LIBNATIVEHELPER_PATH)/toStringArray.cpp \
+    			$(FRAMEWORK_JNI_PATH)/AndroidRuntime.cpp
 				
 
 include $(BUILD_SHARED_LIBRARY)
