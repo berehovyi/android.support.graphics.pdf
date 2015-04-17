@@ -15,10 +15,10 @@
  */
 
 #include "jni.h"
-#include "JNIHelp.h"
-#include "GraphicsJNI.h"
-#include "SkBitmap.h"
-#include "SkMatrix.h"
+//#include "JNIHelp.h"
+//#include "GraphicsJNI.h"
+//#include "SkBitmap.h"
+//#include "SkMatrix.h"
 #include "fpdfview.h"
 
 #pragma GCC diagnostic push

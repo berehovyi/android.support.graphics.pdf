@@ -11,11 +11,41 @@ LIBNATIVEHELPER_PATH		:= libnativehelper
 PREBUILD_PATH				:= prebuild
 EXTERNAL_PDFIUM_PATH		:= external/pdfium
 
+LOCAL_FDO_SUPPORT := true
+
+LOCAL_ARM_MODE := thumb
+ifeq ($(TARGET_ARCH),arm)
+	ifeq ($(ARCH_ARM_HAVE_VFP),true)
+		LOCAL_CFLAGS += -DANDROID_LARGE_MEMORY_DEVICE
+	endif
+else
+	LOCAL_CFLAGS += -DANDROID_LARGE_MEMORY_DEVICE
+endif
+
+ifeq ($(NO_FALLBACK_FONT),true)
+	LOCAL_CFLAGS += -DNO_FALLBACK_FONT
+endif
+
+ifneq ($(strip $(TARGET_FDO_CFLAGS)),)
+	LOCAL_CFLAGS += -O2
+endif
+
+LOCAL_CFLAGS += \
+	-Wno-unused-parameter \
+	-U_FORTIFY_SOURCE \
+	-D_FORTIFY_SOURCE=1
+
+LOCAL_CPPFLAGS := \
+	-Wno-invalid-offsetof
+
+
+
 LOCAL_MODULE		:= SupportPdf
 LOCAL_C_INCLUDES	:= \
 				jni/$(FRAMEWORK_JNI_PATH) \
 				jni/$(FRAMEWORK_GRAPHICS_PATH) \
 				jni/$(EXTERNAL_SKIA_PATH)/core \
+				jni/$(EXTERNAL_SKIA_PATH)/gpu \
 				jni/$(EXTERNAL_SKIA_PATH)/image \
 				jni/$(EXTERNAL_SKIA_PATH)/utils \
 				jni/$(SYSTEM_CORE_PATH)/include \
@@ -38,7 +68,6 @@ LOCAL_SRC_FILES		:= \
 				$(EXTERNAL_SKIA_PATH)/core/SkBBoxHierarchyRecord.cpp \
 				$(EXTERNAL_SKIA_PATH)/core/SkBitmap.cpp \
 				$(EXTERNAL_SKIA_PATH)/core/SkBitmapDevice.cpp \
-				$(EXTERNAL_SKIA_PATH)/core/SkBitmapFilter.cpp \
 				$(EXTERNAL_SKIA_PATH)/core/SkBitmapHeap.cpp \
 				$(EXTERNAL_SKIA_PATH)/core/SkBitmapProcShader.cpp \
 				$(EXTERNAL_SKIA_PATH)/core/SkBitmapProcState.cpp \
