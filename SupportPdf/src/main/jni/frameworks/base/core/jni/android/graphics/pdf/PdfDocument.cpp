@@ -16,17 +16,17 @@
 
 #include <jni.h>
 #include "GraphicsJNI.h"
-//#include "core_jni_helpers.h"
+#include "core_jni_helpers.h"
 #include <vector>
 
-//#include "Canvas.h"
-//#include "CreateJavaOutputStreamAdaptor.h"
+#include "Canvas.h"
+#include "CreateJavaOutputStreamAdaptor.h"
 //
-//#include "SkDocument.h"
-//#include "SkPicture.h"
-//#include "SkPictureRecorder.h"
-//#include "SkStream.h"
-//#include "SkRect.h"
+#include "SkDocument.h"
+#include "SkPicture.h"
+#include "SkPictureRecorder.h"
+#include "SkStream.h"
+#include "SkRect.h"
 
 namespace android {
 

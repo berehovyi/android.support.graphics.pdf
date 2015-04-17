@@ -222,8 +222,13 @@
 #define SK_DISABLE_PIXELREF_LOCKCOUNT_BALANCE_CHECK
 #define SkLONGLONG int64_t
 #define SK_DEFAULT_FONT_CACHE_LIMIT   (768 * 1024)
-#define SK_ATOMICS_PLATFORM_H "../../src/ports/SkAtomics_sync.h"
-#define SK_MUTEX_PLATFORM_H "../../src/ports/SkMutex_pthread.h"
+
+//#define SK_ATOMICS_PLATFORM_H "../../src/ports/SkAtomics_sync.h"
+#define SK_ATOMICS_PLATFORM_H "../ports/SkAtomics_sync.h"
+
+//#define SK_MUTEX_PLATFORM_H "../../src/ports/SkMutex_pthread.h"
+#define SK_MUTEX_PLATFORM_H "../ports/SkMutex_pthread.h"
+
 #define SK_SUPPORT_LEGACY_CLIPTOLAYERFLAG
 #define SK_ATTR_DEPRECATED SK_NOTHING_ARG1
 #define SK_SUPPORT_LEGACY_SHADER_LOCALMATRIX
