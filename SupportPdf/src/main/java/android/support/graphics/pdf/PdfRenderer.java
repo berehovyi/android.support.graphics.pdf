@@ -16,23 +16,21 @@
 
 package android.support.graphics.pdf;
 
-import android.annotation.IntDef;
-import android.annotation.NonNull;
-import android.annotation.Nullable;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
 import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.ParcelFileDescriptor;
-import android.system.ErrnoException;
-import android.system.OsConstants;
-import dalvik.system.CloseGuard;
-import libcore.io.Libcore;
+import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+
+import dalvik.support.system.CloseGuard;
 
 /**
  * <p>
@@ -137,13 +135,7 @@ public final class PdfRenderer implements AutoCloseable {
             throw new NullPointerException("input cannot be null");
         }
 
-        final long size;
-        try {
-            Libcore.os.lseek(input.getFileDescriptor(), 0, OsConstants.SEEK_SET);
-            size = Libcore.os.fstat(input.getFileDescriptor()).st_size;
-        } catch (ErrnoException ee) {
-            throw new IllegalArgumentException("file descriptor not seekable");
-        }
+        final long size = input.getStatSize();
 
         mInput = input;
         mNativeDocument = nativeCreate(mInput.getFd(), size);
@@ -374,9 +366,21 @@ public final class PdfRenderer implements AutoCloseable {
             final int contentBottom = (destClip != null) ? destClip.bottom
                     : destination.getHeight();
 
-            final long transformPtr = (transform != null) ? transform.native_instance : 0;
+            final long transformPtr;
+            try {
+                transformPtr = (transform != null) ? transform.getClass().getDeclaredField("native_instance").getLong(transform) : 0;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            final long bitmapPtr;
+            try {
+                bitmapPtr = destination.getClass().getDeclaredField("mNativeBitmap").getLong(destination);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
 
-            nativeRenderPage(mNativeDocument, mNativePage, destination.mNativeBitmap, contentLeft,
+
+            nativeRenderPage(mNativeDocument, mNativePage, bitmapPtr, contentLeft,
                     contentTop, contentRight, contentBottom, transformPtr, renderMode);
         }
 

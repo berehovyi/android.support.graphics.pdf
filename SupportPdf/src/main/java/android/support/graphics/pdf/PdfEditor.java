@@ -16,15 +16,12 @@
 
 package android.support.graphics.pdf;
 
-import android.annotation.NonNull;
 import android.os.ParcelFileDescriptor;
-import android.system.ErrnoException;
-import android.system.OsConstants;
-import dalvik.system.CloseGuard;
-import libcore.io.IoUtils;
-import libcore.io.Libcore;
+import android.support.annotation.NonNull;
 
 import java.io.IOException;
+
+import dalvik.support.system.CloseGuard;
 
 /**
  * Class for editing PDF files.
@@ -62,13 +59,7 @@ public final class PdfEditor {
             throw new NullPointerException("input cannot be null");
         }
 
-        final long size;
-        try {
-            Libcore.os.lseek(input.getFileDescriptor(), 0, OsConstants.SEEK_SET);
-            size = Libcore.os.fstat(input.getFileDescriptor()).st_size;
-        } catch (ErrnoException ee) {
-            throw new IllegalArgumentException("file descriptor not seekable");
-        }
+        final long size = input.getStatSize();
 
         mInput = input;
         mNativeDocument = nativeOpen(mInput.getFd(), size);
@@ -110,7 +101,11 @@ public final class PdfEditor {
             throwIfClosed();
             nativeWrite(mNativeDocument, output.getFd());
         } finally {
-            IoUtils.closeQuietly(output);
+            try {
+                Class.forName("libcore.io.IoUtils").getDeclaredMethod("closeQuietly", AutoCloseable.class).invoke(null, output);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
@@ -137,7 +132,11 @@ public final class PdfEditor {
 
     private void doClose() {
         nativeClose(mNativeDocument);
-        IoUtils.closeQuietly(mInput);
+        try {
+            Class.forName("libcore.io.IoUtils").getDeclaredMethod("closeQuietly", AutoCloseable.class).invoke(null, mInput);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         mInput = null;
         mCloseGuard.close();
     }

@@ -16,18 +16,16 @@
 
 package android.support.graphics.pdf;
 
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.Rect;
-
-import dalvik.system.CloseGuard;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import dalvik.support.system.CloseGuard;
 
 /**
  * <p>
@@ -121,7 +119,7 @@ public class PdfDocument {
         long nativeCanvas = nativeStartPage(mNativeDocument, pageInfo.mPageWidth,
                 pageInfo.mPageHeight, pageInfo.mContentRect.left, pageInfo.mContentRect.top,
                 pageInfo.mContentRect.right, pageInfo.mContentRect.bottom);
-        
+
         final Canvas canvas;
         try {
             canvas = Canvas.class.getDeclaredConstructor(long.class).newInstance(nativeCanvas);
@@ -444,7 +442,12 @@ public class PdfDocument {
 
         private void finish() {
             if (mCanvas != null) {
-                mCanvas.release();
+                try {
+                    Canvas.class.getDeclaredMethod("release").invoke(mCanvas);
+                    //mCanvas.release();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
                 mCanvas = null;
             }
         }

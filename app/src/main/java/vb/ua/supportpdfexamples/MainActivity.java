@@ -1,33 +1,32 @@
 package vb.ua.supportpdfexamples;
 
-import android.support.v7.app.ActionBarActivity;
+import android.app.Activity;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.os.Environment;
+import android.os.ParcelFileDescriptor;
+import android.support.graphics.pdf.PdfRenderer;
+import android.widget.ImageView;
+
+import java.io.File;
+import java.io.IOException;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends Activity {
 
+    private ImageView imageView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-    }
 
+        imageView = (ImageView) findViewById(R.id.image_for_pdf);
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.action_settings) {
-            return true;
+        final File file = new File(Environment.getExternalStorageDirectory(), "example.pdf");
+        try {
+            final ParcelFileDescriptor parcelFileDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY);
+            PdfRenderer pdfRenderer = new PdfRenderer(parcelFileDescriptor);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-
-        return super.onOptionsItemSelected(item);
     }
 }
