@@ -380,8 +380,8 @@ public final class PdfRenderer implements AutoCloseable {
             }
 
 
-            nativeRenderPage(mNativeDocument, mNativePage, bitmapPtr, contentLeft,
-                    contentTop, contentRight, contentBottom, transformPtr, renderMode);
+//            nativeRenderPage(mNativeDocument, mNativePage, bitmapPtr, contentLeft,
+//                    contentTop, contentRight, contentBottom, transformPtr, renderMode);
         }
 
         /**
@@ -425,8 +425,8 @@ public final class PdfRenderer implements AutoCloseable {
     private static native void nativeClose(long documentPtr);
     private static native int nativeGetPageCount(long documentPtr);
     private static native boolean nativeScaleForPrinting(long documentPtr);
-    private static native void nativeRenderPage(long documentPtr, long pagePtr, long destPtr,
-            int destLeft, int destTop, int destRight, int destBottom, long matrixPtr, int renderMode);
+//    private static native void nativeRenderPage(long documentPtr, long pagePtr, long destPtr,
+//            int destLeft, int destTop, int destRight, int destBottom, long matrixPtr, int renderMode);
     private static native long nativeOpenPageAndGetSize(long documentPtr, int pageIndex,
             Point outSize);
     private static native void nativeClosePage(long pagePtr);
