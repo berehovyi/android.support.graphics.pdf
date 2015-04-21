@@ -1,1 +1,1 @@
-include ':app', ':SupportPdf'
+include ':ExampleApplication', ':SupportPdfLibrary'

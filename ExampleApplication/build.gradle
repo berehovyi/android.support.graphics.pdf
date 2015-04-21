@@ -1,5 +1,3 @@
-import org.apache.tools.ant.taskdefs.condition.Os
-
 apply plugin: 'com.android.application'
 
 android {
@@ -22,5 +20,5 @@ android {
 }
 
 dependencies {
-    compile project(':SupportPdf')
+    compile project(':SupportPdfLibrary')
 }
