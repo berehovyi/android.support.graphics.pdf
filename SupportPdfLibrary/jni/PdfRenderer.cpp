@@ -270,11 +270,11 @@ void Java_android_support_graphics_pdf_PdfRenderer_nativeRenderPage(JNIEnv* env,
         renderFlags |= FPDF_PRINTING;
     }
 
-	FPDF_RenderPageBitmap(bitmap, page, destLeft, destTop, destRight, destBottom, 0, 0);
+	//FPDF_RenderPageBitmap(bitmap, page, destLeft, destTop, destRight, destBottom, 0, 0);
 	//ALOGE("Looks1: %p", page);
 
-    //renderPageBitmap(bitmap, page, destLeft, destTop, destRight,
-    //        destBottom, /*skMatrix,*/ renderFlags);
+    renderPageBitmap(bitmap, page, destLeft, destTop, destRight,
+            destBottom, /*skMatrix,*/ renderFlags);
 
 	AndroidBitmap_unlockPixels(env, javaBitmap);
 	
