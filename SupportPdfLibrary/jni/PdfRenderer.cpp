@@ -28,6 +28,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <android/log.h>
+#include <android/bitmap.h>
 
 #include "Mutex.h"
 
@@ -225,21 +226,8 @@ void renderPageBitmap(FPDF_BITMAP bitmap, FPDF_PAGE page, int destLeft, int dest
     pageContext->Create(pPage);
 
     CFX_AffineMatrix matrix;
-//    if (!transform) {
-//        pPage->GetDisplayMatrix(matrix, destLeft, destTop, destRight - destLeft,
-//                destBottom - destTop, 0);
-//    } else {
-        // PDF's coordinate system origin is left-bottom while
-        // in graphics it is the top-left, so remap the origin.
-        matrix.Set(1, 0, 0, -1, 0, pPage->GetPageHeight());
-
-//        SkScalar transformValues[6];
-//        transform->asAffine(transformValues);
-//
-//        matrix.Concat(transformValues[SkMatrix::kAScaleX], transformValues[SkMatrix::kASkewY],
-//                transformValues[SkMatrix::kASkewX], transformValues[SkMatrix::kAScaleY],
-//                transformValues[SkMatrix::kATransX], transformValues[SkMatrix::kATransY]);
-//    }
+    pPage->GetDisplayMatrix(matrix, destLeft, destTop, destRight - destLeft,
+                            destBottom - destTop, 0);
     pageContext->AppendObjectList(pPage, &matrix);
 
     pContext->m_pRenderer = FX_NEW CPDF_ProgressiveRenderer;
@@ -254,19 +242,21 @@ void renderPageBitmap(FPDF_BITMAP bitmap, FPDF_PAGE page, int destLeft, int dest
 
 extern "C"
 void Java_android_support_graphics_pdf_PdfRenderer_nativeRenderPage(JNIEnv* env, jclass thiz, jlong documentPtr, jlong pagePtr,
-        jlong bitmapPtr, jint destLeft, jint destTop, jint destRight, jint destBottom,
+        jobject javaBitmap, jint destLeft, jint destTop, jint destRight, jint destBottom,
         /*jlong matrixPtr,*/ jint renderMode) {
 
     FPDF_PAGE page = reinterpret_cast<FPDF_PAGE>(pagePtr);
-//    SkBitmap* skBitmap = reinterpret_cast<SkBitmap*>(bitmapPtr);
-//    SkMatrix* skMatrix = reinterpret_cast<SkMatrix*>(matrixPtr);
+    AndroidBitmapInfo info;
+    void* pixels;
 
-//    skBitmap->lockPixels();
+    if (AndroidBitmap_getInfo(env, javaBitmap, &info) < 0) {
+        ALOGE("Erorr getting bitmap info");
+        return;
+    }
+	AndroidBitmap_lockPixels(env, javaBitmap, &pixels);
 
-//    const int stride = skBitmap->width() * 4;
-
-    FPDF_BITMAP bitmap = NULL;//FPDFBitmap_CreateEx(skBitmap->width(), skBitmap->height(),
-            //FPDFBitmap_BGRA, skBitmap->getPixels(), stride);
+    FPDF_BITMAP bitmap = FPDFBitmap_CreateEx(info.width, info.height,
+            FPDFBitmap_BGRA, pixels, info.stride);
 
     if (!bitmap) {
         ALOGE("Erorr creating bitmap");
@@ -280,11 +270,15 @@ void Java_android_support_graphics_pdf_PdfRenderer_nativeRenderPage(JNIEnv* env,
         renderFlags |= FPDF_PRINTING;
     }
 
-    renderPageBitmap(bitmap, page, destLeft, destTop, destRight,
-            destBottom, /*skMatrix,*/ renderFlags);
+	FPDF_RenderPageBitmap(bitmap, page, destLeft, destTop, destRight, destBottom, 0, 0);
+	//ALOGE("Looks1: %p", page);
 
-//    skBitmap->notifyPixelsChanged();
-//    skBitmap->unlockPixels();
+    //renderPageBitmap(bitmap, page, destLeft, destTop, destRight,
+    //        destBottom, /*skMatrix,*/ renderFlags);
+
+	AndroidBitmap_unlockPixels(env, javaBitmap);
+	
+	ALOGE("Looks like rendered: %d, pixels: %p", FPDF_GetLastError(), pixels);
 }
 
 extern "C"

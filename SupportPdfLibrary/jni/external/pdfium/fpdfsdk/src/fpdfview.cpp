@@ -10,6 +10,9 @@
 #include "../include/fpdf_progressive.h"
 #include "../include/fpdf_ext.h"
 
+#include <android/log.h>
+#define LOG_TAG "fpdf"
+#define LOGI(...) __android_log_print(ANDROID_LOG_INFO,LOG_TAG,__VA_ARGS__)
 
 CPDF_CustomAccess::CPDF_CustomAccess(FPDF_FILEACCESS* pFileAccess)
 {
@@ -605,6 +608,7 @@ DLLEXPORT void STDCALL FPDF_RenderPage(HDC dc, FPDF_PAGE page, int start_x, int 
 DLLEXPORT void STDCALL FPDF_RenderPageBitmap(FPDF_BITMAP bitmap, FPDF_PAGE page, int start_x, int start_y, 
 						int size_x, int size_y, int rotate, int flags)
 {
+    LOGI("Bitmap: %p, Page: %p", bitmap, page);
 	if (bitmap == NULL || page == NULL) return;
 	CPDF_Page* pPage = (CPDF_Page*)page;
 
@@ -775,12 +779,12 @@ DLLEXPORT void STDCALL FPDFBitmap_Destroy(FPDF_BITMAP bitmap)
 	if (bitmap == NULL) return;
 	delete (CFX_DIBitmap*)bitmap;
 }
-
 void FPDF_RenderPage_Retail(CRenderContext* pContext, FPDF_PAGE page, int start_x, int start_y, int size_x, int size_y,
 						int rotate, int flags,FX_BOOL bNeedToRestore, IFSDK_PAUSE_Adapter * pause )
 {
 //#ifdef _LICENSED_BUILD_
 	CPDF_Page* pPage = (CPDF_Page*)page;
+	LOGI("Page: %p", pPage);
 	if (pPage == NULL) return;
 
 	if (!pContext->m_pOptions)

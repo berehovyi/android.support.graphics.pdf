@@ -9,7 +9,6 @@ import android.support.graphics.pdf.PdfRenderer;
 import android.widget.ImageView;
 
 import java.io.File;
-import java.io.IOException;
 
 
 public class MainActivity extends Activity {
@@ -25,17 +24,22 @@ public class MainActivity extends Activity {
         final File file = new File(Environment.getExternalStorageDirectory(), "example.pdf");
         try {
             final ParcelFileDescriptor parcelFileDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY);
-            PdfRenderer pdfRenderer = new PdfRenderer(parcelFileDescriptor);
+            final PdfRenderer pdfRenderer = new PdfRenderer(parcelFileDescriptor);
 
             final int pageCount = pdfRenderer.getPageCount();
-            final PdfRenderer.Page page = pdfRenderer.openPage(0);
-            final Bitmap bitmap = Bitmap.createBitmap(page.getWidth(), page.getHeight(), Bitmap.Config.ARGB_8888);
+            final PdfRenderer.Page page = pdfRenderer.openPage(6);
+            final int width = page.getWidth();
+            final int height = page.getHeight();
 
-            page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+            final Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+            imageView.setBackgroundColor(0xffffffff);
+
+            page.render(bitmap, null, PdfRenderer.Page.RENDER_MODE_FOR_PRINT);
             imageView.setImageBitmap(bitmap);
 
             System.err.println("PageCount: " + pageCount);
-        } catch (IOException e) {
+        } catch (Throwable e) {
             throw new RuntimeException(e);
         }
     }

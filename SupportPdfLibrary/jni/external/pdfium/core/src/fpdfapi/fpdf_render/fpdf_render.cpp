@@ -1091,6 +1091,8 @@ void CPDF_ProgressiveRenderer::Clear()
     }
     m_Status = Ready;
 }
+#include <android/log.h>
+#define  LOGI(...)  __android_log_print(ANDROID_LOG_INFO,"fpdf",__VA_ARGS__)
 void CPDF_ProgressiveRenderer::Start(CPDF_RenderContext* pContext, CFX_RenderDevice* pDevice,
                                      const CPDF_RenderOptions* pOptions, IFX_Pause* pPause, FX_BOOL bDropObjects)
 {
@@ -1102,7 +1104,9 @@ void CPDF_ProgressiveRenderer::Start(CPDF_RenderContext* pContext, CFX_RenderDev
     m_pDevice = pDevice;
     m_pOptions = pOptions;
     m_bDropObjects = bDropObjects;
+    LOGI("started render");
     if (pContext == NULL || pDevice == NULL) {
+        LOGI("started render failed");
         m_Status = Failed;
         return;
     }
@@ -1124,7 +1128,9 @@ void CPDF_ProgressiveRenderer::Continue(IFX_Pause* pPause)
         return;
     }
     FX_DWORD nLayers = m_pContext->m_ContentList.GetSize();
+    LOGI("nLayers: %d", nLayers);
     for (; m_LayerIndex < nLayers; m_LayerIndex ++) {
+        LOGI("render iter: %d/%d", m_LayerIndex, nLayers);
         _PDF_RenderItem* pItem = m_pContext->m_ContentList.GetDataPtr(m_LayerIndex);
         FX_POSITION LastPos = pItem->m_pObjectList->GetLastObjectPosition();
         if (m_ObjectPos == NULL) {
@@ -1132,6 +1138,7 @@ void CPDF_ProgressiveRenderer::Continue(IFX_Pause* pPause)
                 if (!pItem->m_pObjectList->IsParsed()) {
                     pItem->m_pObjectList->ContinueParse(pPause);
                     if (!pItem->m_pObjectList->IsParsed()) {
+                        LOGI("item not parsed");
                         return;
                     }
                     LastPos = pItem->m_pObjectList->GetLastObjectPosition();
@@ -1145,6 +1152,7 @@ void CPDF_ProgressiveRenderer::Continue(IFX_Pause* pPause)
                     m_ObjectPos = NULL;
                     m_PrevLastPos = NULL;
                 }
+                LOGI("continue");
                 continue;
             }
             if (m_PrevLastPos) {
@@ -1173,6 +1181,7 @@ void CPDF_ProgressiveRenderer::Continue(IFX_Pause* pPause)
             if (pCurObj && pCurObj->m_Left <= m_ClipRect.right && pCurObj->m_Right >= m_ClipRect.left &&
                     pCurObj->m_Bottom <= m_ClipRect.top && pCurObj->m_Top >= m_ClipRect.bottom) {
                 if (m_pRenderer->ContinueSingleObject(pCurObj, &pItem->m_Matrix, pPause)) {
+                    LOGI("need to pause 4");
                     return;
                 }
 #if !defined(_FPDFAPI_MINI_)
@@ -1190,12 +1199,14 @@ void CPDF_ProgressiveRenderer::Continue(IFX_Pause* pPause)
             pItem->m_pObjectList->GetNextObject(m_ObjectPos);
             if (objs_to_go == 0) {
                 if (pPause && pPause->NeedToPauseNow()) {
+                    LOGI("need to pause 3");
                     return;
                 }
                 objs_to_go = CPDF_ModuleMgr::Get()->GetRenderModule()->GetConfig()->m_RenderStepLimit;
             }
         }
         if (!pItem->m_pObjectList->IsParsed()) {
+            LOGI("need to pause 2");
             return;
         }
         delete m_pRenderer;
@@ -1205,9 +1216,11 @@ void CPDF_ProgressiveRenderer::Continue(IFX_Pause* pPause)
         m_PrevLastPos = NULL;
         if (pPause && pPause->NeedToPauseNow()) {
             m_LayerIndex++;
+            LOGI("need to pause");
             return;
         }
     }
+    LOGI("m_Status = Done");
     m_Status = Done;
 }
 int CPDF_ProgressiveRenderer::EstimateProgress()

@@ -18,7 +18,6 @@ package android.support.graphics.pdf;
 
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
-import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.os.ParcelFileDescriptor;
@@ -331,14 +330,13 @@ public final class PdfRenderer implements AutoCloseable {
          *
          * @param destination Destination bitmap to which to render.
          * @param destClip Optional clip in the bitmap bounds.
-         * @param transform Optional transformation to apply when rendering.
          * @param renderMode The render mode.
          *
          * @see #RENDER_MODE_FOR_DISPLAY
          * @see #RENDER_MODE_FOR_PRINT
          */
         public void render(@NonNull Bitmap destination, @Nullable Rect destClip,
-                           @Nullable Matrix transform, @RenderMode int renderMode) {
+                           /*@Nullable Matrix transform,*/ @RenderMode int renderMode) {
             if (destination.getConfig() != Config.ARGB_8888) {
                 throw new IllegalArgumentException("Unsupported pixel format");
             }
@@ -351,9 +349,9 @@ public final class PdfRenderer implements AutoCloseable {
                 }
             }
 
-            if (transform != null && !transform.isAffine()) {
+            /*if (transform != null && !transform.isAffine()) {
                  throw new IllegalArgumentException("transform not affine");
-            }
+            }*/
 
             if (renderMode != RENDER_MODE_FOR_PRINT && renderMode != RENDER_MODE_FOR_DISPLAY) {
                 throw new IllegalArgumentException("Unsupported render mode");
@@ -370,22 +368,16 @@ public final class PdfRenderer implements AutoCloseable {
             final int contentBottom = (destClip != null) ? destClip.bottom
                     : destination.getHeight();
 
-            final long transformPtr;
+            /*final long transformPtr;
             try {
                 transformPtr = (transform != null) ? transform.getClass().getDeclaredField("native_instance").getLong(transform) : 0;
             } catch (Exception e) {
                 throw new RuntimeException(e);
-            }
-            final long bitmapPtr;
-            try {
-                bitmapPtr = destination.getClass().getDeclaredField("mNativeBitmap").getLong(destination);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            }*/
 
 
-            nativeRenderPage(mNativeDocument, mNativePage, bitmapPtr, contentLeft,
-                    contentTop, contentRight, contentBottom, transformPtr, renderMode);
+            nativeRenderPage(mNativeDocument, mNativePage, destination, contentLeft,
+                    contentTop, contentRight, contentBottom, /*transformPtr,*/ renderMode);
         }
 
         /**
@@ -429,8 +421,10 @@ public final class PdfRenderer implements AutoCloseable {
     private static native void nativeClose(long documentPtr);
     private static native int nativeGetPageCount(long documentPtr);
     private static native boolean nativeScaleForPrinting(long documentPtr);
-    private static native void nativeRenderPage(long documentPtr, long pagePtr, long destPtr,
-            int destLeft, int destTop, int destRight, int destBottom, long matrixPtr, int renderMode);
+
+    //jlong documentPtr, jlong pagePtr, jobject javaBitmap, jint destLeft, jint destTop, jint destRight, jint destBottom, /*jlong matrixPtr,*/ jint renderMode
+    private static native void nativeRenderPage(long documentPtr, long pagePtr, Bitmap destination,
+            int destLeft, int destTop, int destRight, int destBottom, /*long matrixPtr,*/ int renderMode);
     private static native long nativeOpenPageAndGetSize(long documentPtr, int pageIndex,
             Point outSize);
     private static native void nativeClosePage(long pagePtr);

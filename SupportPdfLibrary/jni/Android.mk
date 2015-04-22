@@ -5,11 +5,12 @@ EXTERNAL_PDFIUM_PATH		:= external/pdfium
 PDFIUM_CORE_SRC				:= $(EXTERNAL_PDFIUM_PATH)/core/src
 PDFIUM_FPDFSDK_SRC			:= $(EXTERNAL_PDFIUM_PATH)/fpdfsdk/src
 
-LOCAL_MODULE		:= SupportPdf
-LOCAL_CFLAGS		+= -O3 -fstrict-aliasing -fprefetch-loop-arrays -fexceptions
-LOCAL_C_INCLUDES	:= jni/$(EXTERNAL_PDFIUM_PATH)/fpdfsdk/include
-LOCAL_LDLIBS		:= -llog
-LOCAL_SRC_FILES		:=	PdfRenderer.cpp \
+LOCAL_MODULE			:= SupportPdf
+LOCAL_CFLAGS			+= -O3 -fstrict-aliasing -fprefetch-loop-arrays -fexceptions -DFOXIT_CHROME_BUILD
+LOCAL_C_INCLUDES		:= jni/$(EXTERNAL_PDFIUM_PATH)/fpdfsdk/include
+LOCAL_LDLIBS			:= -llog -ljnigraphics
+LOCAL_NDK_STL_VARIANT	:= gnustl_static
+LOCAL_SRC_FILES			:=	PdfRenderer.cpp \
 						$(PDFIUM_FPDFSDK_SRC)/fpdf_dataavail.cpp \
 						$(PDFIUM_FPDFSDK_SRC)/fpdf_ext.cpp \
 						$(PDFIUM_FPDFSDK_SRC)/fpdf_flatten.cpp \
